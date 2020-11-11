@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using Confluent.Kafka;
 using Ports;
 using Partitioner = Confluent.Kafka.Partitioner;
@@ -19,7 +18,7 @@ namespace KafkaAdapter
         
         public static KafkaPositionAwareEventConsumerBuilder NewUsing(string kafkaConnectionString)
         {
-            var config = new ProducerConfig { BootstrapServers = "localhost:9092"};
+            var config = new ProducerConfig { BootstrapServers = kafkaConnectionString, Partitioner = Partitioner.Consistent};
             var producer = new ProducerBuilder<string, string>(config).Build();
             
             return new KafkaPositionAwareEventConsumerBuilder(producer);
