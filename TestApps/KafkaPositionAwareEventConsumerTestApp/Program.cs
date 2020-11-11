@@ -19,7 +19,7 @@ namespace KafkaPositionAwareEventConsumerTestApp
             var eventEnvelopes = Enumerable.Range(0, 10000)
                 .Select(i => new EventEnvelope(
                     TopicName.Of("TestTopic"),
-                    PartitionName.Of($"TestTopic.{i % 10}"),
+                    PartitioningKey.Of($"TestTopic.{i % 10}"),
                     EventPosition.Of((ulong)i),
                     TestEvent.New)).ToList();
 

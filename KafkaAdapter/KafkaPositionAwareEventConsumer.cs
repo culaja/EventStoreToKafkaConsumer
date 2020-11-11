@@ -35,7 +35,7 @@ namespace KafkaAdapter
             {
                 await _producer.ProduceAsync(eventEnvelope.TopicName, new Message<string, string>
                 {
-                    Key = eventEnvelope.PartitionName,
+                    Key = eventEnvelope.PartitioningKey,
                     Value = eventEnvelope.Serialize()
                 });
             }
