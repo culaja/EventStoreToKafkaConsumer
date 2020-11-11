@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Confluent.Kafka;
 using Framework;
 using Ports;
+using static Framework.Optional<Confluent.Kafka.DeliveryReport<string,string>>;
 
 namespace KafkaAdapter
 {
@@ -21,28 +20,31 @@ namespace KafkaAdapter
             return EventPosition.Of(0);
         }
         
-        public async Task Consume(IReadOnlyList<EventEnvelope> eventEnvelopes)
+        public void Consume(IReadOnlyList<EventEnvelope> eventEnvelopes)
         {
+            Optional<DeliveryReport<string, string>> optionalFirstFailedDeliveryReport = None;
+            void DeliveryHandler(DeliveryReport<string, string> report)
+            {
+                if (report.Error.IsError && optionalFirstFailedDeliveryReport.HasNoValue)
+                {
+                    optionalFirstFailedDeliveryReport = report;
+                }
+            }
+            
             foreach (var eventEnvelope in eventEnvelopes)
             {
-                await Produce(eventEnvelope);
-            }
-        }
-
-        private async Task Produce(EventEnvelope eventEnvelope)
-        {
-            try
-            {
-                await _producer.ProduceAsync(eventEnvelope.TopicName, new Message<string, string>
+                _producer.Produce(eventEnvelope.TopicName, new Message<string, string>
                 {
                     Key = eventEnvelope.PartitioningKey,
                     Value = eventEnvelope.Serialize()
-                });
+                }, DeliveryHandler);
             }
-            catch (ProduceException<string, string> ex)
+
+            _producer.Flush();
+
+            if (optionalFirstFailedDeliveryReport.HasValue)
             {
-                Console.WriteLine(ex);
-                throw;
+                throw new FailedToProduceKafkaMessageException(optionalFirstFailedDeliveryReport.Value);
             }
         }
     }
