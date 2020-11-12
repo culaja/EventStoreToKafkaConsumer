@@ -32,7 +32,7 @@ namespace KafkaPositionAwareEventConsumerTestApp
             var lastKnownEventPosition = producerBuilder.PositionAwareEventConsumer.LastKnownEventPositionFor(TestTopicName);
             Console.WriteLine(lastKnownEventPosition);
 
-            var eventEnvelopes = Enumerable.Range(0, 10000)
+            var eventEnvelopes = Enumerable.Range((int)(ulong)lastKnownEventPosition + 1, 10000)
                 .Select(i => new EventEnvelope(
                     TestTopicName,
                     PartitioningKey.Of($"TestTopic.{i % 10}"),

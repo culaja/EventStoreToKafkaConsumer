@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Confluent.Kafka;
 using Framework;
 using Ports;
-using static Confluent.Kafka.ErrorCode;
 using static Framework.Optional<Confluent.Kafka.DeliveryReport<string,string>>;
 
 namespace KafkaAdapter
@@ -23,24 +22,13 @@ namespace KafkaAdapter
 
         public EventPosition LastKnownEventPositionFor(TopicName topicName)
         {
-            try
-            {
-                using var consumer = _consumerBuilder.Build();
-                consumer.Subscribe(topicName);
-                var consumeResult = consumer.Consume(TimeSpan.FromSeconds(5));
-                var eventEnvelope = EventEnvelopeDto.Deserialize(consumeResult.Message.Value).ToDomain();
-                return eventEnvelope.EventPosition;
-            }
-            catch (ConsumeException ex)
-            {
-                switch (ex)
-                {
-                    case var e when e.Error.Code == UnknownTopicOrPart:
-                        return EventPosition.Beginning;
-                    default:
-                        throw;
-                }
-            }
+            using var consumer = _consumerBuilder.Build();
+            consumer.Subscribe(topicName);
+            var lastEventEnvelopes = consumer.ConsumeLastEventEnvelopes();
+            return lastEventEnvelopes
+                .Select(ee => ee.EventPosition)
+                .DefaultIfEmpty(EventPosition.Beginning)
+                .Max();
         }
         
         public void Consume(IReadOnlyList<EventEnvelope> eventEnvelopes)
