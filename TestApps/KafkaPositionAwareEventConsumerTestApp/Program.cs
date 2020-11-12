@@ -27,7 +27,9 @@ namespace KafkaPositionAwareEventConsumerTestApp
         
         public static void Main()
         {
-            using var producerBuilder = KafkaPositionAwareEventConsumerBuilder.NewUsing("localhost:9092");
+            using var producerBuilder = KafkaPositionAwareEventConsumerBuilder.NewUsing(
+                "localhost:9092",
+                "esToKafkaConsumerGroup");
 
             var lastKnownEventPosition = producerBuilder.PositionAwareEventConsumer.LastKnownEventPositionFor(TestTopicName);
             Console.WriteLine(lastKnownEventPosition);

@@ -22,12 +22,14 @@ namespace KafkaAdapter
         public IAmPositionAwareEventConsumer PositionAwareEventConsumer => 
             new KafkaPositionAwareEventConsumer(_producer, _lastMessageConsumer);
         
-        public static KafkaPositionAwareEventConsumerBuilder NewUsing(string kafkaConnectionString)
+        public static KafkaPositionAwareEventConsumerBuilder NewUsing(
+            string kafkaConnectionString,
+            string adminConsumerGroupId)
         {
             var producerConfig = new ProducerConfig { BootstrapServers = kafkaConnectionString, Partitioner = Partitioner.Consistent};
             var producer = new ProducerBuilder<string, string>(producerConfig).Build();
             
-            var lastMessageConsumer = LastMessageConsumer.For(kafkaConnectionString);
+            var lastMessageConsumer = LastMessageConsumer.For(kafkaConnectionString, adminConsumerGroupId);
             
             return new KafkaPositionAwareEventConsumerBuilder(producer, lastMessageConsumer);
         }
