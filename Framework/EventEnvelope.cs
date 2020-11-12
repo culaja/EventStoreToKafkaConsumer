@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace Framework
 {
@@ -8,18 +7,18 @@ namespace Framework
         public TopicName TopicName { get; }
         public PartitioningKey PartitioningKey { get; }
         public EventPosition EventPosition { get; }
-        public IAmEvent Event { get; }
+        public string SerializedEvent { get; }
 
         public EventEnvelope(
             TopicName topicName,
             PartitioningKey partitioningKey,
             EventPosition eventPosition,
-            IAmEvent @event)
+            string serializedEvent)
         {
             TopicName = topicName;
             PartitioningKey = partitioningKey;
             EventPosition = eventPosition;
-            Event = @event;
+            SerializedEvent = serializedEvent;
         }
 
         protected override IEnumerable<object> GetEqualityComponents()
@@ -27,12 +26,7 @@ namespace Framework
             yield return TopicName;
             yield return PartitioningKey;
             yield return EventPosition;
-            yield return Event;
+            yield return SerializedEvent;
         }
-
-        public string Serialize() => JsonConvert.SerializeObject(this);
-
-        public static EventEnvelope Deserialize(string data) => 
-            JsonConvert.DeserializeObject<EventEnvelope>(data);
     }
 }

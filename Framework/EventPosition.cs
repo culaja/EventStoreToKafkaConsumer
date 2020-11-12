@@ -10,6 +10,8 @@ namespace Framework
         {
             _position = position;
         }
+        
+        public static readonly EventPosition Beginning = new EventPosition(0UL);
 
         protected override IEnumerable<object> GetEqualityComponents()
         {

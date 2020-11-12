@@ -32,7 +32,7 @@ namespace KafkaAdapter
             { 
                 GroupId = buildingKafkaTopicConsumerGroup,
                 BootstrapServers = kafkaConnectionString,
-                AutoOffsetReset = AutoOffsetReset.Earliest
+                AutoOffsetReset = AutoOffsetReset.Latest
             };
             
             return new KafkaPositionAwareEventConsumerBuilder(producer, new ConsumerBuilder<string, string>(consumerConfig));
