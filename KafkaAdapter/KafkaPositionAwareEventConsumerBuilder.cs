@@ -21,14 +21,16 @@ namespace KafkaAdapter
         public IAmPositionAwareEventConsumer PositionAwareEventConsumer => 
             new KafkaPositionAwareEventConsumer(_producer, _consumerBuilder);
         
-        public static KafkaPositionAwareEventConsumerBuilder NewUsing(string kafkaConnectionString)
+        public static KafkaPositionAwareEventConsumerBuilder NewUsing(
+            string kafkaConnectionString,
+            string buildingKafkaTopicConsumerGroup = "buildingKafkaTopicConsumerGroup")
         {
             var producerConfig = new ProducerConfig { BootstrapServers = kafkaConnectionString, Partitioner = Partitioner.Consistent};
             var producer = new ProducerBuilder<string, string>(producerConfig).Build();
             
             var consumerConfig = new ConsumerConfig
             { 
-                GroupId = "test-consumer-group",
+                GroupId = buildingKafkaTopicConsumerGroup,
                 BootstrapServers = kafkaConnectionString,
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
