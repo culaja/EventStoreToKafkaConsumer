@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Confluent.Kafka;
 using Framework;
 using Ports;
@@ -9,15 +10,23 @@ namespace KafkaAdapter
     internal sealed class KafkaPositionAwareEventConsumer : IAmPositionAwareEventConsumer
     {
         private readonly IProducer<string, string> _producer;
+        private readonly ConsumerBuilder<string, string> _consumerBuilder;
 
-        public KafkaPositionAwareEventConsumer(IProducer<string, string> producer)
+        public KafkaPositionAwareEventConsumer(
+            IProducer<string, string> producer,
+            ConsumerBuilder<string, string> consumerBuilder)
         {
             _producer = producer;
+            _consumerBuilder = consumerBuilder;
         }
 
         public EventPosition LastKnownEventPositionFor(TopicName topicName)
         {
-            return EventPosition.Of(0);
+            using var consumer = _consumerBuilder.Build();
+            consumer.Subscribe(topicName);
+            var consumeResult = consumer.Consume(TimeSpan.FromSeconds(5));
+            var eventEnvelope = EventEnvelope.Deserialize(consumeResult.Message.Value);
+            return eventEnvelope.EventPosition;
         }
         
         public void Consume(IReadOnlyList<EventEnvelope> eventEnvelopes)

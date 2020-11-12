@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Framework
 {
@@ -29,9 +30,9 @@ namespace Framework
             yield return Event;
         }
 
-        public string Serialize()
-        {
-            return $"{TopicName}.{PartitioningKey}";
-        }
+        public string Serialize() => JsonConvert.SerializeObject(this);
+
+        public static EventEnvelope Deserialize(string data) => 
+            JsonConvert.DeserializeObject<EventEnvelope>(data);
     }
 }

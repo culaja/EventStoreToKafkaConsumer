@@ -8,20 +8,32 @@ namespace KafkaAdapter
     public sealed class KafkaPositionAwareEventConsumerBuilder : IDisposable
     {
         private readonly IProducer<string, string> _producer;
+        private readonly ConsumerBuilder<string, string> _consumerBuilder;
 
-        private KafkaPositionAwareEventConsumerBuilder(IProducer<string, string> producer)
+        private KafkaPositionAwareEventConsumerBuilder(
+            IProducer<string, string> producer,
+            ConsumerBuilder<string, string> consumerBuilder)
         {
             _producer = producer;
+            _consumerBuilder = consumerBuilder;
         }
 
-        public IAmPositionAwareEventConsumer PositionAwareEventConsumer => new KafkaPositionAwareEventConsumer(_producer);
+        public IAmPositionAwareEventConsumer PositionAwareEventConsumer => 
+            new KafkaPositionAwareEventConsumer(_producer, _consumerBuilder);
         
         public static KafkaPositionAwareEventConsumerBuilder NewUsing(string kafkaConnectionString)
         {
-            var config = new ProducerConfig { BootstrapServers = kafkaConnectionString, Partitioner = Partitioner.Consistent};
-            var producer = new ProducerBuilder<string, string>(config).Build();
+            var producerConfig = new ProducerConfig { BootstrapServers = kafkaConnectionString, Partitioner = Partitioner.Consistent};
+            var producer = new ProducerBuilder<string, string>(producerConfig).Build();
             
-            return new KafkaPositionAwareEventConsumerBuilder(producer);
+            var consumerConfig = new ConsumerConfig
+            { 
+                GroupId = "test-consumer-group",
+                BootstrapServers = kafkaConnectionString,
+                AutoOffsetReset = AutoOffsetReset.Earliest
+            };
+            
+            return new KafkaPositionAwareEventConsumerBuilder(producer, new ConsumerBuilder<string, string>(consumerConfig));
         }
 
         public void Dispose()
