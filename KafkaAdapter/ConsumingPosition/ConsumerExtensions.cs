@@ -4,7 +4,7 @@ using Confluent.Kafka;
 using Framework;
 using static Confluent.Kafka.ErrorCode;
 
-namespace KafkaAdapter
+namespace KafkaAdapter.ConsumingPosition
 {
     internal static class ConsumerExtensions
     {

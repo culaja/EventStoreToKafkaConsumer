@@ -2,6 +2,7 @@
 using System.Linq;
 using Confluent.Kafka;
 using Framework;
+using KafkaAdapter.ConsumingPosition;
 using Ports;
 using static Framework.Optional<Confluent.Kafka.DeliveryReport<string,string>>;
 
@@ -10,21 +11,19 @@ namespace KafkaAdapter
     internal sealed class KafkaPositionAwareEventConsumer : IAmPositionAwareEventConsumer
     {
         private readonly IProducer<string, string> _producer;
-        private readonly ConsumerBuilder<string, string> _consumerBuilder;
+        private readonly LastMessageConsumer _lastMessageConsumer;
 
         public KafkaPositionAwareEventConsumer(
             IProducer<string, string> producer,
-            ConsumerBuilder<string, string> consumerBuilder)
+            LastMessageConsumer lastMessageConsumer)
         {
             _producer = producer;
-            _consumerBuilder = consumerBuilder;
+            _lastMessageConsumer = lastMessageConsumer;
         }
 
         public EventPosition LastKnownEventPositionFor(TopicName topicName)
         {
-            using var consumer = _consumerBuilder.Build();
-            consumer.Subscribe(topicName);
-            var lastEventEnvelopes = consumer.ConsumeLastEventEnvelopes();
+            var lastEventEnvelopes = _lastMessageConsumer.ConsumeLastEventEnvelopesFor(topicName);
             return lastEventEnvelopes
                 .Select(ee => ee.EventPosition)
                 .DefaultIfEmpty(EventPosition.Beginning)
