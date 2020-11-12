@@ -9,17 +9,14 @@ namespace KafkaAdapter.ConsumingPosition
     internal sealed class LastMessageConsumer
     {
         private readonly string _connectionString;
-        private readonly string _buildingTopicConsumerGroup;
 
-        private LastMessageConsumer(string connectionString, string buildingTopicConsumerGroup)
+        private LastMessageConsumer(string connectionString)
         {
             _connectionString = connectionString;
-            _buildingTopicConsumerGroup = buildingTopicConsumerGroup;
         }
         
         public static LastMessageConsumer For(
-            string connectionString, 
-            string buildingTopicConsumerGroup) => new LastMessageConsumer(connectionString, buildingTopicConsumerGroup);
+            string connectionString) => new LastMessageConsumer(connectionString);
 
         public IReadOnlyList<EventEnvelope> ConsumeLastEventEnvelopesFor(TopicName topicName)
         {
@@ -32,7 +29,7 @@ namespace KafkaAdapter.ConsumingPosition
         {
             var consumerConfig = new ConsumerConfig
             { 
-                GroupId = _buildingTopicConsumerGroup,
+                GroupId = Guid.NewGuid().ToString(),
                 BootstrapServers = _connectionString
             };
             var builder = new ConsumerBuilder<string, string>(consumerConfig)
