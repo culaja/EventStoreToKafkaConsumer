@@ -27,21 +27,31 @@ namespace KafkaPositionAwareEventConsumerTestApp
         
         public static void Main()
         {
-            using var producerBuilder = KafkaPositionAwareEventConsumerBuilder.NewUsing(
-                "localhost:9092",
-                "esToKafkaConsumerGroup");
+            using var consumerBuilder = KafkaEventConsumerBuilder.NewUsing("localhost:9092");
+            
+            consumerBuilder.EventConsumer.RegisterOnConsumingResults(consumingReport =>
+            {
+                if (consumingReport.IsSuccess)
+                {
+                    Console.Write(".");
+                }
+                else
+                {
+                    Console.Write("X");
+                }
+            });
 
-            var lastKnownEventPosition = producerBuilder.PositionAwareEventConsumer.LastKnownEventPositionFor(TestTopicName);
-            Console.WriteLine(lastKnownEventPosition);
-
-            var eventEnvelopes = Enumerable.Range((int)(ulong)lastKnownEventPosition + 1, 10000)
+            var eventEnvelopes = Enumerable.Range(0, 10000)
                 .Select(i => new EventEnvelope(
                     TestTopicName,
                     PartitioningKey.Of($"TestTopic.{i % 10}"),
                     EventPosition.Of((ulong)i),
                     JsonConvert.SerializeObject(TestEvent.New))).ToList();
-            
-            producerBuilder.PositionAwareEventConsumer.Consume(eventEnvelopes);
+
+            foreach (var eventEnvelope in eventEnvelopes)
+            {
+                consumerBuilder.EventConsumer.Consume(eventEnvelope);
+            }
         }
     }
 }
