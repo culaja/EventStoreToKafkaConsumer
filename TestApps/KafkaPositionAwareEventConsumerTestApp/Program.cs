@@ -27,19 +27,10 @@ namespace KafkaPositionAwareEventConsumerTestApp
         
         public static void Main()
         {
-            using var consumerBuilder = KafkaEventConsumerBuilder.NewUsing("localhost:9092");
+            using var consumerBuilder = KafkaAtLeastOnceOrderedEventConsumerBuilder.NewUsing("localhost:9092");
             
-            consumerBuilder.EventConsumer.RegisterOnConsumingResults(consumingReport =>
-            {
-                if (consumingReport.IsSuccess)
-                {
-                    Console.Write(".");
-                }
-                else
-                {
-                    Console.Write("X");
-                }
-            });
+            consumerBuilder.Consumer.RegisterOnConsumingResults(consumingReport => 
+                Console.WriteLine(consumingReport.IsSuccess ? "." : "X"));
 
             var eventEnvelopes = Enumerable.Range(0, 10000)
                 .Select(i => new EventEnvelope(
@@ -50,7 +41,7 @@ namespace KafkaPositionAwareEventConsumerTestApp
 
             foreach (var eventEnvelope in eventEnvelopes)
             {
-                consumerBuilder.EventConsumer.Consume(eventEnvelope);
+                consumerBuilder.Consumer.Consume(eventEnvelope);
             }
         }
     }

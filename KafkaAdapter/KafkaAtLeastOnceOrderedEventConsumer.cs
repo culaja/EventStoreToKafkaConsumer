@@ -5,12 +5,12 @@ using Ports;
 
 namespace KafkaAdapter
 {
-    internal sealed class KafkaEventConsumer : IAmEventConsumer
+    internal sealed class KafkaAtLeastOnceOrderedEventConsumer : IAmAtLeastOnceOrderedEventConsumer
     {
         private ConsumingResultDelegate _consumingResultDelegate = result => { };
         private readonly IProducer<string, string> _producer;
 
-        public KafkaEventConsumer(IProducer<string, string> producer)
+        public KafkaAtLeastOnceOrderedEventConsumer(IProducer<string, string> producer)
         {
             _producer = producer;
         }

@@ -4,24 +4,24 @@ using Ports;
 
 namespace KafkaAdapter
 {
-    public sealed class KafkaEventConsumerBuilder : IDisposable
+    public sealed class KafkaAtLeastOnceOrderedEventConsumerBuilder : IDisposable
     {
         private readonly IProducer<string, string> _producer;
 
-        private KafkaEventConsumerBuilder(IProducer<string, string> producer)
+        private KafkaAtLeastOnceOrderedEventConsumerBuilder(IProducer<string, string> producer)
         {
             _producer = producer;
-            EventConsumer = new KafkaEventConsumer(_producer);
+            Consumer = new KafkaAtLeastOnceOrderedEventConsumer(_producer);
         }
 
-        public IAmEventConsumer EventConsumer { get; }
+        public IAmAtLeastOnceOrderedEventConsumer Consumer { get; }
         
-        public static KafkaEventConsumerBuilder NewUsing(string kafkaConnectionString)
+        public static KafkaAtLeastOnceOrderedEventConsumerBuilder NewUsing(string kafkaConnectionString)
         {
             var producerConfig = new ProducerConfig { BootstrapServers = kafkaConnectionString };
             var producer = new ProducerBuilder<string, string>(producerConfig).Build();
             
-            return new KafkaEventConsumerBuilder(producer);
+            return new KafkaAtLeastOnceOrderedEventConsumerBuilder(producer);
         }
 
         public void Dispose()
