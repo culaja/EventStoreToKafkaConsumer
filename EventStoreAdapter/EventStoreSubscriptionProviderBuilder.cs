@@ -12,31 +12,37 @@ namespace EventStoreAdapter
         public EventStoreSubscriptionProviderBuilder(
             IEventStoreConnection eventStoreConnection,
             UserCredentials userCredentials,
-            string positionStoreStreamName)
+            string positionStoreStreamName,
+            string filterPattern)
         {
             _eventStoreConnection = eventStoreConnection;
             EventSubscriptionProvider = new EventStoreSubscriptionProvider(
                 _eventStoreConnection,
                 userCredentials,
-                positionStoreStreamName);
+                positionStoreStreamName,
+                filterPattern);
         }
 
         public static EventStoreSubscriptionProviderBuilder NewUsing(
             string eventStoreConnectionString,
             string userName,
             string password,
-            string positionStoreStreamName)
+            string positionStoreStreamName,
+            string filerPattern)
         {
             var connection = EventStoreConnection.Create(
-                ConnectionSettings.Create().KeepReconnecting(),
+                ConnectionSettings.Create()
+                    .KeepReconnecting()
+                    .KeepRetrying(),
                 new Uri(eventStoreConnectionString));
             
-            connection.ConnectAsync();
+            connection.ConnectAsync().Wait();
             
             return new EventStoreSubscriptionProviderBuilder(
                 connection,
                 new UserCredentials(userName, password),
-                positionStoreStreamName);
+                positionStoreStreamName,
+                filerPattern);
         }
 
         public IAmEventSubscriptionProvider EventSubscriptionProvider { get; }

@@ -5,18 +5,32 @@ namespace EventStoreAdapter
 {
     internal static class ConversionExtensions
     {
-        public static EventEnvelope ToEventEnvelopeWith(this ResolvedEvent resolvedEvent, TopicName topicName)
+        public static Optional<EventEnvelope> ToOptionalEventEnvelopeWith(
+            this ResolvedEvent resolvedEvent,
+            TopicName topicName,
+            string filterPattern)
         {
-            return new EventEnvelope(
-                topicName,
-                resolvedEvent.OriginalStreamId.ToPartitioningKey(),
-                resolvedEvent.OriginalPosition.ToEventPosition(),
-                resolvedEvent.Event.Data,
-                resolvedEvent.Event.Metadata);
+            return resolvedEvent.OriginalStreamId.ToOptionalPartitioningKey(filterPattern).Map(partitioningKey =>
+                new EventEnvelope(
+                    topicName,
+                    partitioningKey,
+                    resolvedEvent.OriginalPosition.ToEventPosition(),
+                    resolvedEvent.Event.Data,
+                    resolvedEvent.Event.Metadata));
         }
 
-        private static PartitioningKey ToPartitioningKey(this string originalStreamId) => 
-            PartitioningKey.Of(originalStreamId.Split('|')[0]);
+        private static Optional<PartitioningKey> ToOptionalPartitioningKey(
+            this string originalStreamId,
+            string filterPattern)
+        {
+            var array = originalStreamId.Split('|');
+            if (array.Length > 1 && array[0] == filterPattern)
+            {
+                return PartitioningKey.Of(array[1]); 
+            }
+
+            return Optional<PartitioningKey>.None;
+        }
 
         private static EventPosition ToEventPosition(this Position? position) =>
             position.HasValue

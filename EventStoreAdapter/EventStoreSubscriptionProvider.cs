@@ -10,15 +10,18 @@ namespace EventStoreAdapter
         private readonly IEventStoreConnection _connection;
         private readonly UserCredentials _userCredentials;
         private readonly string _subscriptionName;
+        private readonly string _filterPattern;
 
         public EventStoreSubscriptionProvider(
             IEventStoreConnection connection,
             UserCredentials userCredentials,
-            string subscriptionName)
+            string subscriptionName,
+            string filterPattern)
         {
             _connection = connection;
             _userCredentials = userCredentials;
             _subscriptionName = subscriptionName;
+            _filterPattern = filterPattern;
         }
         
         public IAmEventSubscription Subscribe(
@@ -28,11 +31,20 @@ namespace EventStoreAdapter
             SubscriptionDroppedDelegate subscriptionDroppedHandler)
         {
             var topicPosition = EventPosition.Beginning;
-            
+
+            void EventAppeared(EventStoreCatchUpSubscription _, ResolvedEvent e)
+            {
+                var optional = e.ToOptionalEventEnvelopeWith(topicName, _filterPattern);
+                if (optional.HasValue)
+                {
+                    newEventEnvelopeReceivedHandler(optional.Value);
+                }
+            }
+
             var catchUpSubscription = _connection.SubscribeToAllFrom(
-                Position.Start, 
+                null, 
                 CatchUpSubscriptionSettings.Default, 
-                (_, e) => newEventEnvelopeReceivedHandler(e.ToEventEnvelopeWith(topicName)),
+                EventAppeared,
                 _ => liveProcessingStartedHandler(),
                 (_, r, ex) => subscriptionDroppedHandler(r.ToString(), ex),
                 _userCredentials);
