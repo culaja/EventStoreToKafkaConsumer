@@ -4,6 +4,8 @@ namespace Framework
 {
     public sealed class TopicName : ValueObject
     {
+        public static readonly TopicName AllEvents = new TopicName(nameof(AllEvents));
+        
         private readonly string _name;
 
         private TopicName(string name)

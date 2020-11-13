@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestApps", "TestApps", "{7E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KafkaPositionAwareEventConsumerTestApp", "TestApps\KafkaPositionAwareEventConsumerTestApp\KafkaPositionAwareEventConsumerTestApp.csproj", "{74D2F6A2-5842-4F11-AAD3-6924422D4CF7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStoreAdapter", "EventStoreAdapter\EventStoreAdapter.csproj", "{59715BD5-61FE-4377-91A5-E13633CA4E4D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{74D2F6A2-5842-4F11-AAD3-6924422D4CF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74D2F6A2-5842-4F11-AAD3-6924422D4CF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74D2F6A2-5842-4F11-AAD3-6924422D4CF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59715BD5-61FE-4377-91A5-E13633CA4E4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59715BD5-61FE-4377-91A5-E13633CA4E4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59715BD5-61FE-4377-91A5-E13633CA4E4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59715BD5-61FE-4377-91A5-E13633CA4E4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{74D2F6A2-5842-4F11-AAD3-6924422D4CF7} = {7E6E28E5-AF9F-4AEE-9C50-0C349653AF4D}

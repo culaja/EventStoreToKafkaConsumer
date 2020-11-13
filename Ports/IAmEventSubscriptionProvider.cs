@@ -4,16 +4,23 @@ using Framework;
 
 namespace Ports
 {
-    public delegate void EventConsumerDelegate(IReadOnlyList<EventEnvelope> eventEnvelopes);
+    public delegate void NewEventEnvelopeReceivedDelegate(EventEnvelope eventEnvelope);
+    public delegate void LiveProcessingStartedDelegate();
+    public delegate void SubscriptionDroppedDelegate(string reason, Exception exception);
     
-    public interface IAmSubscription : IDisposable
+    public interface IAmEventSubscription : IDisposable
     {
         TopicName TopicName { get; }
         EventPosition EventStartPosition { get; }
+        void AckConsumed(EventPosition eventPosition);
     }
     
     public interface IAmEventSubscriptionProvider
     {
-        IAmSubscription Subscribe(TopicName topicName, EventPosition eventPosition);
+        IAmEventSubscription Subscribe(
+            TopicName topicName,
+            NewEventEnvelopeReceivedDelegate newEventEnvelopeReceivedHandler,
+            LiveProcessingStartedDelegate liveProcessingStartedHandler,
+            SubscriptionDroppedDelegate subscriptionDroppedHandler);
     }
 }

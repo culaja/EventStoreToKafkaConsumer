@@ -4,24 +4,24 @@ namespace Framework
 {
     public sealed class EventPosition : ValueObject
     {
-        private readonly ulong _position;
+        private readonly long[] _position;
 
-        private EventPosition(ulong position)
+        private EventPosition(params long[] position)
         {
             _position = position;
         }
         
-        public static readonly EventPosition Beginning = new EventPosition(0UL);
+        public static readonly EventPosition Beginning = new EventPosition(0L, 0L);
 
         protected override IEnumerable<object> GetEqualityComponents()
         {
-            yield return _position;
+            foreach (var item in _position) yield return item;
         }
 
-        public static EventPosition Of(ulong position) => new EventPosition(position);
-        
-        public override string ToString() => _position.ToString();
+        public static EventPosition Of(params long[] position) => new EventPosition(position);
 
-        public static implicit operator ulong(EventPosition eventPosition) => eventPosition._position;
+        public override string ToString() => string.Join(".", _position);
+
+        public static implicit operator long[](EventPosition eventPosition) => eventPosition._position;
     }
 }

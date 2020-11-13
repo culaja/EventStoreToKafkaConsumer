@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using Framework;
 using KafkaAdapter;
 using Newtonsoft.Json;
@@ -30,14 +31,15 @@ namespace KafkaPositionAwareEventConsumerTestApp
             using var consumerBuilder = KafkaAtLeastOnceOrderedEventConsumerBuilder.NewUsing("localhost:9092");
             
             consumerBuilder.Consumer.RegisterOnConsumingResults(consumingReport => 
-                Console.WriteLine(consumingReport.IsSuccess ? "." : "X"));
+                Console.Write(consumingReport.IsSuccess ? "." : "X"));
 
             var eventEnvelopes = Enumerable.Range(0, 10000)
                 .Select(i => new EventEnvelope(
                     TestTopicName,
                     PartitioningKey.Of($"TestTopic.{i % 10}"),
-                    EventPosition.Of((ulong)i),
-                    JsonConvert.SerializeObject(TestEvent.New))).ToList();
+                    EventPosition.Of(i, i),
+                    Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(TestEvent.New)),
+                    Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(TestEvent.New)))).ToList();
 
             foreach (var eventEnvelope in eventEnvelopes)
             {
