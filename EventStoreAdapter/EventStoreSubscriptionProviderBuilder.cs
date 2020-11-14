@@ -1,6 +1,5 @@
 ﻿using System;
 using EventStore.ClientAPI;
-using EventStore.ClientAPI.SystemData;
 using Ports;
 
 namespace EventStoreAdapter
@@ -11,22 +10,18 @@ namespace EventStoreAdapter
 
         public EventStoreSubscriptionProviderBuilder(
             IEventStoreConnection eventStoreConnection,
-            UserCredentials userCredentials,
             string positionStoreStreamName,
             string filterPattern)
         {
             _eventStoreConnection = eventStoreConnection;
             EventSubscriptionProvider = new EventStoreSubscriptionProvider(
                 _eventStoreConnection,
-                userCredentials,
                 positionStoreStreamName,
                 filterPattern);
         }
 
         public static EventStoreSubscriptionProviderBuilder NewUsing(
             string eventStoreConnectionString,
-            string userName,
-            string password,
             string positionStoreStreamName,
             string filerPattern)
         {
@@ -40,7 +35,6 @@ namespace EventStoreAdapter
             
             return new EventStoreSubscriptionProviderBuilder(
                 connection,
-                new UserCredentials(userName, password),
                 positionStoreStreamName,
                 filerPattern);
         }

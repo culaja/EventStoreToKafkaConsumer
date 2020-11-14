@@ -30,5 +30,10 @@ namespace Framework
             yield return PartitioningKey;
             yield return EventPosition;
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(TopicName)}: {TopicName}, {nameof(PartitioningKey)}: {PartitioningKey}, {nameof(EventPosition)}: {EventPosition}";
+        }
     }
 }

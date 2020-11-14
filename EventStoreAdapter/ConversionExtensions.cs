@@ -24,9 +24,9 @@ namespace EventStoreAdapter
             string filterPattern)
         {
             var array = originalStreamId.Split('|');
-            if (array.Length > 1 && array[0] == filterPattern)
+            if (array.Length > 2 && array[0] == filterPattern)
             {
-                return PartitioningKey.Of(array[1]); 
+                return PartitioningKey.Of(array[2]);
             }
 
             return Optional<PartitioningKey>.None;

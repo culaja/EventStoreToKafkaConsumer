@@ -1,5 +1,4 @@
 ﻿using EventStore.ClientAPI;
-using EventStore.ClientAPI.SystemData;
 using Framework;
 using Ports;
 
@@ -8,18 +7,15 @@ namespace EventStoreAdapter
     internal sealed class EventStoreSubscriptionProvider : IAmEventSubscriptionProvider
     {
         private readonly IEventStoreConnection _connection;
-        private readonly UserCredentials _userCredentials;
         private readonly string _subscriptionName;
         private readonly string _filterPattern;
 
         public EventStoreSubscriptionProvider(
             IEventStoreConnection connection,
-            UserCredentials userCredentials,
             string subscriptionName,
             string filterPattern)
         {
             _connection = connection;
-            _userCredentials = userCredentials;
             _subscriptionName = subscriptionName;
             _filterPattern = filterPattern;
         }
@@ -46,8 +42,7 @@ namespace EventStoreAdapter
                 CatchUpSubscriptionSettings.Default, 
                 EventAppeared,
                 _ => liveProcessingStartedHandler(),
-                (_, r, ex) => subscriptionDroppedHandler(r.ToString(), ex),
-                _userCredentials);
+                (_, r, ex) => subscriptionDroppedHandler(r.ToString(), ex));
             
             return new EventStoreSubscription(
                 topicName, 

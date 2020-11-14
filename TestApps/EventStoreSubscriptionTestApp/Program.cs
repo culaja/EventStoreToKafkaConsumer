@@ -9,9 +9,7 @@ namespace EventStoreSubscriptionTestApp
         public static void Main()
         {
             using var builder = EventStoreSubscriptionProviderBuilder.NewUsing(
-                "tcp://localhost:1113",
-                "admin",
-                "changeit",
+                "tcp://admin:changeit@localhost:1113",
                 "positionStoreStreamName",
                 "Domain");
 
